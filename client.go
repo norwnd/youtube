@@ -477,6 +477,8 @@ func (c *Client) GetStreamURL(video *Video, format *Format) (string, error) {
 
 // GetStreamURLContext returns the url for a specific format with a context
 func (c *Client) GetStreamURLContext(ctx context.Context, video *Video, format *Format) (string, error) {
+	c.assureClient()
+
 	if format == nil {
 		return "", ErrNoFormat
 	}
@@ -613,7 +615,7 @@ func (c *Client) httpPostBodyBytes(ctx context.Context, url string, body interfa
 
 // downloadChunk returns the chunk bytes.
 // Downloading in multiple chunks is much faster:
-// https://github.com/kkdai/youtube/pull/190
+// https://github.com/norwnd/youtube/pull/190
 func (c *Client) downloadChunk(req *http.Request, chunk chunk) ([]byte, error) {
 	q := req.URL.Query()
 	q.Set("range", fmt.Sprintf("%d-%d", chunk.start, chunk.end))
@@ -621,7 +623,11 @@ func (c *Client) downloadChunk(req *http.Request, chunk chunk) ([]byte, error) {
 
 	resp, err := c.httpDo(req)
 	if err != nil {
-		return nil, ErrUnexpectedStatusCode(resp.StatusCode)
+		statusCode := 0 // unknown
+		if resp != nil {
+			statusCode = resp.StatusCode
+		}
+		return nil, fmt.Errorf("unexpected error in downloadChunk, status code: %d, err: %w", statusCode, err)
 	}
 	defer resp.Body.Close()
 

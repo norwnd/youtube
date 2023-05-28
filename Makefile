@@ -3,7 +3,7 @@ FILES_TO_FMT      ?= $(shell find . -path ./vendor -prune -o -name '*.go' -print
 ## help: Show makefile commands
 .PHONY: help
 help: Makefile
-	@echo "---- Project: kkdai/youtube ----"
+	@echo "---- Project: norwnd/youtube ----"
 	@echo " Usage: make COMMAND"
 	@echo
 	@echo " Management Commands:"
